@@ -38,6 +38,7 @@ function verifyJWT(req, res, next) {
 async function run() {
     try {
         const appointmentOptionCollection = client.db('doctorsPortal').collection('appointmentOptions');
+        const allServicesCollection = client.db('doctorsPortal').collection('allServices');
         const bookingsCollection = client.db('doctorsPortal').collection('booknigs');
         const usersCollection = client.db('doctorsPortal').collection('users');
         const doctorsCollection = client.db('doctorsPortal').collection('doctors');
@@ -61,20 +62,41 @@ async function run() {
             const date = req.query.date;
             const query = {};
             const options = await appointmentOptionCollection.find(query).toArray();
-
-            // get the booking of the provide date
-            const bookingQuery = { appointmentDate: date }
-            const alreadyBooked = await bookingsCollection.find(bookingQuery).toArray();
-            //    code carefully :D
-            options.forEach(option => {
-                const optionBooked = alreadyBooked.filter(book => book.treatment === option.name);
-                const bookedSlots = optionBooked.map(book => book.slot);
-                const remainingSlots = option.slots.filter(slot => !bookedSlots.includes(slot))
-                option.slots = remainingSlots;
-            })
             res.send(options);
         });
+        /////////////////////////////
 
+
+        // app.get('/appointmentOptions/:id', (req, res) => {
+        //     const id = req.params.id;
+        //     if (id === '03') {
+        //         res.send(allServicesCollection);
+        //     }
+        //     else {
+        //         const query = {_id:ObjectId(id)};
+        //         const category_news = allServicesCollection.find(query);
+        //         res.send(category_news);
+        //     }
+        // });
+
+
+        app.get('/allServices',async (req, res) =>{
+            const date = req.query.date;
+            const query = {};
+            const options = await allServicesCollection.find(query).toArray();
+            res.send(options);
+        });
+        
+        app.get('/allServices/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {category_id: id };
+            const services = await allServicesCollection.find(query).toArray();
+            res.send(services);
+        
+        });
+        
+      
+        ///////////////////
         app.get('/v2/apponimentOptions', async (req, res) => {
             const data = req.query.data;
             const option = await appointmentOptionCollection.aggregate([
