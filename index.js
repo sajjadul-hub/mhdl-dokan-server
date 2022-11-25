@@ -43,6 +43,7 @@ async function run() {
         const usersCollection = client.db('doctorsPortal').collection('users');
         const doctorsCollection = client.db('doctorsPortal').collection('doctors');
         const paymentsCollection = client.db('doctorsPortal').collection('payments');
+        const advertisingCollection = client.db('doctorsPortal').collection('advertising');
 
 
         // NOTE: make sure you use verifyAdmin after verifyJWT
@@ -67,35 +68,22 @@ async function run() {
         /////////////////////////////
 
 
-        // app.get('/appointmentOptions/:id', (req, res) => {
-        //     const id = req.params.id;
-        //     if (id === '03') {
-        //         res.send(allServicesCollection);
-        //     }
-        //     else {
-        //         const query = {_id:ObjectId(id)};
-        //         const category_news = allServicesCollection.find(query);
-        //         res.send(category_news);
-        //     }
-        // });
-
-
-        app.get('/allServices',async (req, res) =>{
+        app.get('/allServices', async (req, res) => {
             const date = req.query.date;
             const query = {};
             const options = await allServicesCollection.find(query).toArray();
             res.send(options);
         });
-        
-        app.get('/allServices/:id', async(req, res) => {
+
+        app.get('/allServices/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {category_id: id };
+            const query = { category_id: id };
             const services = await allServicesCollection.find(query).toArray();
             res.send(services);
-        
+
         });
-        
-      
+
+
         ///////////////////
         app.get('/v2/apponimentOptions', async (req, res) => {
             const data = req.query.data;
@@ -180,14 +168,14 @@ async function run() {
             const booking = req.body;
             console.log(booking);
             const query = {
-                appointmentDate: booking.appointmentDate,
+                laptopName: booking.laptopName,
                 email: booking.email,
                 treatment: booking.treatment
             }
 
             const alreadyBooked = await bookingsCollection.find(query).toArray();
             if (alreadyBooked.length) {
-                const message = `You already have a bookingon${booking.appointmentDate}`;
+                const message = `You already have a bookingon${booking.laptopName}`;
                 return res.send({ acknowledged: false, message })
             }
 
@@ -269,7 +257,12 @@ async function run() {
             res.send(result);
         })
 
-
+        app.delete('/users/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        })
         // temporart to  updata price field  on appointment options
         // app.get('/addPrice', async (req, res) => {
         //     const filter = {};
@@ -289,7 +282,7 @@ async function run() {
             res.send(doctors);
         })
 
-        app.post('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
+        app.post('/doctors', verifyJWT, async (req, res) => {
             const doctor = req.body;
             const result = await doctorsCollection.insertOne(doctor);
             res.send(result);
@@ -302,6 +295,31 @@ async function run() {
             res.send(result);
         })
 
+        // advetsing///////////////////////
+
+        app.post('/advertising', async (req, res) => {
+            const booking = req.body;
+            console.log(booking);
+            const query = {
+                laptopName: booking.title,
+                email: booking.email,
+            }
+
+            const alreadyBooked = await advertisingCollection.find(query).toArray();
+            if (alreadyBooked.length) {
+                const message = `You already have a advertising${booking.title}`;
+                return res.send({ acknowledged: false, message })
+            }
+
+            const result = await advertisingCollection.insertOne(booking);
+            res.send(result);
+        })
+
+        app.get('/advertising', async (req, res) => {
+            const query = {};
+            const doctors = await advertisingCollection.find(query).toArray();
+            res.send(doctors);
+        })
 
     }
     finally {
