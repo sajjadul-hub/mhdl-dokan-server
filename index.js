@@ -231,18 +231,34 @@ async function run() {
             const users = await usersCollection.find(query).toArray();
             res.send(users);
         });
-
+        // Postion for admin =====================================
         app.get('/users/admin/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' });
         })
+          // Postion for seller =====================================
+        app.get('/users/seller/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isSeller: user?.role === 'seller' });
+        })
+          // Postion for admin buyer =====================================
+        app.get('/users/buyer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isSeller: user?.role === 'buyer' });
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
+
 
         app.put('/users/admin/:id', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
@@ -301,16 +317,15 @@ async function run() {
             const booking = req.body;
             console.log(booking);
             const query = {
-                laptopName: booking.title,
+                title: booking.title,
                 email: booking.email,
+                price: booking.price,
             }
-
             const alreadyBooked = await advertisingCollection.find(query).toArray();
             if (alreadyBooked.length) {
-                const message = `You already have a advertising${booking.title}`;
+                const message = `It's already have a advertising${booking.title}`;
                 return res.send({ acknowledged: false, message })
             }
-
             const result = await advertisingCollection.insertOne(booking);
             res.send(result);
         })
