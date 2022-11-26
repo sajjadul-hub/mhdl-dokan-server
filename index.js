@@ -44,6 +44,7 @@ async function run() {
         const doctorsCollection = client.db('doctorsPortal').collection('doctors');
         const paymentsCollection = client.db('doctorsPortal').collection('payments');
         const advertisingCollection = client.db('doctorsPortal').collection('advertising');
+        const productsCollection = client.db('doctorsPortal').collection('products');
 
 
         // NOTE: make sure you use verifyAdmin after verifyJWT
@@ -145,12 +146,8 @@ async function run() {
             *app.delete('/bookings/:id')
             */
 
-        app.get('/booking', verifyJWT, async (req, res) => {
+        app.get('/booking', async (req, res) => {
             const email = req.query.email;
-            const decodedEmail = req.decoded.email;
-            if (email !== decodedEmail) {
-                return res.status(403).send({ message: 'forbidden access' });
-            }
             const query = { email: email };
             const bookings = await bookingsCollection.find(query).toArray();
             res.send(bookings);
@@ -250,7 +247,7 @@ async function run() {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
-            res.send({ isSeller: user?.role === 'buyer' });
+            res.send({ isBuyer: user?.role === 'buyer' });
         })
 
         app.post('/users', async (req, res) => {
@@ -303,6 +300,16 @@ async function run() {
             const result = await doctorsCollection.insertOne(doctor);
             res.send(result);
         });
+        app.post('/products', async (req, res) => {
+            const products = req.body;
+            const result = await productsCollection.insertOne(products);
+            res.send(result);
+        });
+        app.get('/products', async (req, res) => {
+            const query = {};
+            const products = await productsCollection.find(query).toArray();
+            res.send(products);
+        })
 
         app.delete('/doctors/:id', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
