@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const e = require('express');
 require('dotenv').config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // console.log(stripe);
@@ -305,8 +306,9 @@ async function run() {
             const result = await productsCollection.insertOne(products);
             res.send(result);
         });
-        app.get('/products', async (req, res) => {
-            const query = {};
+        app.get('/products/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
             const products = await productsCollection.find(query).toArray();
             res.send(products);
         })
