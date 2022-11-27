@@ -173,7 +173,9 @@ async function run() {
 
             const alreadyBooked = await bookingsCollection.find(query).toArray();
             if (alreadyBooked.length) {
-                const message = `You already have a bookingon${booking.laptopName}`;
+                const message = `
+                ${booking.laptopName} 
+                It's not available now`;
                 return res.send({ acknowledged: false, message })
             }
 
@@ -332,7 +334,7 @@ async function run() {
             }
             const alreadyBooked = await advertisingCollection.find(query).toArray();
             if (alreadyBooked.length) {
-                const message = `It's already have a advertising${booking.title}`;
+                const message = `It's already have a advertising ${booking.title}`;
                 return res.send({ acknowledged: false, message })
             }
             const result = await advertisingCollection.insertOne(booking);
