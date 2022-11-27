@@ -61,7 +61,6 @@ async function run() {
 
         // use Aggregate to query multiple collection and merge data
         app.get('/appointmentOptions', async (req, res) => {
-            const date = req.query.date;
             const query = {};
             const options = await appointmentOptionCollection.find(query).toArray();
             res.send(options);
@@ -70,7 +69,6 @@ async function run() {
 
 
         app.get('/allServices', async (req, res) => {
-            const date = req.query.date;
             const query = {};
             const options = await allServicesCollection.find(query).toArray();
             res.send(options);
@@ -87,7 +85,6 @@ async function run() {
 
         ///////////////////
         app.get('/v2/apponimentOptions', async (req, res) => {
-            const data = req.query.data;
             const option = await appointmentOptionCollection.aggregate([
                 {
                     $lookup: {
@@ -278,18 +275,7 @@ async function run() {
             const result = await usersCollection.deleteOne(filter);
             res.send(result);
         })
-        // temporart to  updata price field  on appointment options
-        // app.get('/addPrice', async (req, res) => {
-        //     const filter = {};
-        //     const options = { upsert: true };
-        //     const updatedDoc = {
-        //         $set: {
-        //             price: 99
-        //         }
-        //     }
-        //     const result = await appointmentOptionCollection.updateMany(filter, updatedDoc, options);
-        //     res.send(result);
-        // })
+       
 
         app.get('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
             const query = {};
