@@ -235,14 +235,14 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' });
         })
-          // Postion for seller =====================================
+        // Postion for seller =====================================
         app.get('/users/seller/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isSeller: user?.role === 'seller' });
         })
-          // Postion for admin buyer =====================================
+        // Postion for admin buyer =====================================
         app.get('/users/buyer/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
@@ -276,7 +276,7 @@ async function run() {
             const result = await usersCollection.deleteOne(filter);
             res.send(result);
         })
-       
+
 
         app.get('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
             const query = {};
@@ -299,7 +299,7 @@ async function run() {
             const query = {
                 buyerName: reportsProducts.buyerName,
                 email: reportsProducts.email,
-                laptopName:reportsProducts.laptopName
+                laptopName: reportsProducts.laptopName
             }
             console.log(query);
             const alreadyReports = await reportsProductsCollection.find(query).toArray();
@@ -313,10 +313,20 @@ async function run() {
             res.send(result);
         })
         app.get('/reports', async (req, res) => {
-            const query = { }
+            const query = {}
             const reportedproducts = await reportsProductsCollection.find(query).toArray();
             res.send(reportedproducts);
         })
+
+
+        app.delete('/reports/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await reportsProductsCollection.deleteOne(filter);
+            res.send(result);
+        })
+
+
         app.get('/products/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
