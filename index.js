@@ -377,4 +377,4 @@ app.get('/', async (req, res) => {
     res.send('doctoe portal server is  runnig')
 })
 
-app.listen(port, () => console.log(`Doctors  portal runnig ${port}`))
+app.listen(port, () => console.log(`tech-com  portal runnig ${port}`))
