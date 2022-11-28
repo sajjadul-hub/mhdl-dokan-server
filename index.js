@@ -45,6 +45,7 @@ async function run() {
         const paymentsCollection = client.db('doctorsPortal').collection('payments');
         const advertisingCollection = client.db('doctorsPortal').collection('advertising');
         const productsCollection = client.db('doctorsPortal').collection('products');
+        const reportsProductsCollection = client.db('doctorsPortal').collection('reports');
 
 
         // NOTE: make sure you use verifyAdmin after verifyJWT
@@ -293,6 +294,29 @@ async function run() {
             const result = await productsCollection.insertOne(products);
             res.send(result);
         });
+        app.post('/reports', async (req, res) => {
+            const reportsProducts = req.body;
+            const query = {
+                buyerName: reportsProducts.buyerName,
+                email: reportsProducts.email,
+                laptopName:reportsProducts.laptopName
+            }
+            console.log(query);
+            const alreadyReports = await reportsProductsCollection.find(query).toArray();
+            if (alreadyReports.length) {
+                const message = `
+                ${reportsProducts.laptopName} 
+                It's already reported`;
+                return res.send({ acknowledged: false, message })
+            }
+            const result = await reportsProductsCollection.insertOne(reportsProducts);
+            res.send(result);
+        })
+        app.get('/reports', async (req, res) => {
+            const query = { }
+            const reportedproducts = await reportsProductsCollection.find(query).toArray();
+            res.send(reportedproducts);
+        })
         app.get('/products/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
